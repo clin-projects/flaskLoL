@@ -24,7 +24,7 @@ def read_match(gameID):
 	ms = match['gameCreation']
 	t = datetime.datetime.fromtimestamp(ms/1000.0)
 	t = t.astimezone(timezone('US/Pacific'))
-	game_start = t.strftime('%A, %B %d, %Y: %H:%M PST')
+	game_start = t.strftime('%B %d, %Y: %H:%M PST')
 
 	duration = match['gameDuration'] / 60
 	duration_min = int(duration)

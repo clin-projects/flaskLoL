@@ -20,11 +20,9 @@
 
     <main role="main" class="container">
 
-<div class="jumbotron" style="height:160px;vertical-align:middle">
+<div class="jumbotron" style="height: 120px;vertical-align:middle;padding-top: 15px;padding-bottom: 0px;">
     LoL winner winner
     <br><br>
-
-
       <form action="/lol_main" method="GET">
         <div class="form-group">
           <h1 style-"margin-bottom: 0 px">
@@ -46,24 +44,32 @@
         <div class="col-md-3">
 
 <table class="table table-hover">
-<tr><td bgcolor="#0F7CD3" style="color: white" colspan="2"><center>Blue Team</center></td></tr> 
+<tr><td style="vertical-align:middle;padding-top: 5px;padding-bottom: 5px;" colspan="2" height="10" cellpadding="0" cellspacing="0">
+{% if winner[0] %}
+<p style="color:#3cbc8d; font-size:200%; margin-bottom: 3px">Victory</p>
+{% else %}
+<p style="color:#EB9C6B; font-size:200%; margin-bottom: 3px">Defeat</p>
+{% endif %}
+</td></tr> 
 {% for i in range(0,5) %}
 <tr>
   <td style="vertical-align:middle"><img src="{{ game_dat['photos'][i] }}" alt="{{ game_dat['champions'][i] }}" width="70"></td>
-  <td style="vertical-align:middle">{{ game_dat['names'][i] }}</td>
+  <td bgcolor="#478DF4" style="color: white; vertical-align:middle">{{ game_dat['names'][i] }}</td>
   </tr> 
 {% endfor %} 
 </table> 
 
         </div>
         <div class="col-md-6">
+
+
 <div class="starter-template">
 <img src="data:image/png;base64,{{ results }}" width="500">
 
 
 <center><table>
-<tr><td><b>Date and time</b></td> <td align="right">{{ game_dat['game_start'] }}</td></tr>
-<tr><td><b>Duration</b></td> <td align="right">{{ game_dat['duration'] }}</td></tr>
+<tr><td style="width:50%"><b>Date and time</b></td> <td align="right" style="width:50%">{{ game_dat['game_start'] }}</td></tr>
+<tr><td style="width:50%"><b>Duration</b></td> <td align="right" style="width:50%">{{ game_dat['duration'] }}</td></tr>
 </table>
 </center>
 
@@ -72,12 +78,17 @@
         </div>
         <div class="col-md-3">
 
-
 <table class="table table-hover">
-<tr><td bgcolor="#EA7375" style="color: white" colspan="2"><center>Red Team</center></td></tr> 
-{% for i in range(5,11) %}
+<tr><td style="vertical-align:middle;padding-top: 5px;padding-bottom: 5px;" colspan="2" height="10" cellpadding="0" cellspacing="0">
+{% if winner[1] %}
+<p style="color:#3cbc8d; font-size:200%; margin-bottom: 3px">Victory</p>
+{% else %}
+<p style="color:#EB9C6B; font-size:200%; margin-bottom: 3px">Defeat</p>
+{% endif %}
+</td></tr> 
+{% for i in range(5,10) %}
 <tr>
-  <td style="vertical-align:middle">{{ game_dat['names'][i] }}</td>
+  <td bgcolor="#EA7375" style="color: white; vertical-align:middle">{{ game_dat['names'][i] }}</td>
   <td style="vertical-align:middle"><img src="{{ game_dat['photos'][i] }}" alt="{{ game_dat['champions'][i] }}" width="70"></td>
   </tr> 
 {% endfor %} 
