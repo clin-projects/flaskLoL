@@ -1,0 +1,32 @@
+body {
+  padding-top: 50px;
+  padding-bottom: 20px;
+
+}
+.starter-template {
+  padding: 20px 20px;
+  text-align: center;
+}
+
+.jumbotron {
+  padding: 2rem 2rem;
+  margin-bottom: 0px;
+  font-weight: 200;
+  color: inherit;
+  background-color: #eeeeee;
+  text-align: center;
+  font-size: 50px;
+  line-height: 0.6;
+  color: inherit;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 500;
+  vertical-align: middle;
+}
+
+h1 {
+  font-weight: 10;
+  font-size: 20px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 10;
+}
+
