@@ -6,6 +6,8 @@ import datetime
 from pytz import timezone
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from IPython.display import HTML
 
 def read_match(gameID):
 	match_file = '/Users/ccl/anaconda3/envs/LoL/flaskapp/flaskLoL/dat/match_%d.json' % (gameID)
@@ -57,3 +59,44 @@ def get_plot(gameID):
 
 	plot_url = base64.b64encode(img.getvalue()).decode()
 	return plot_url
+
+def test_video_html():
+
+	#=========================================
+	# Create Fake Images using Numpy 
+	# You don't need this in your code as you have your own imageList.
+	# This is used as an example.
+
+	imageList = []
+	n = 40
+	x = np.array(range(n))
+	y = np.random.random(n)
+	imageList = np.array([[x[i],y[i]] for i in range(n)])
+
+	#=========================================
+	# Animate Fake Images (in Jupyter)
+
+	def getImageFromList(x):
+	    
+	    return imageList[x]
+
+	fig = plt.figure(figsize=(10, 10))
+	ims = []
+	for i in range(len(imageList)):
+	#for i in range(1):
+	    im, = plt.plot(imageList[:i+1][:,0],imageList[:i+1][:,1], animated=True,color='blue',marker='o')
+	    #im = plt.scatter(imageList[i][0],imageList[i][1], animated=True,color='blue')
+	    #im.plot(imageList[:i+1][:,0],imageList[:i+1][:,1], animated=True,color='blue')
+	    ims.append([im])
+
+	delay = 1000
+	ani = animation.ArtistAnimation(fig, ims, interval=delay, blit=True, repeat_delay=1000)
+	plt.close()
+
+	# Show the animation
+	html = ani.to_html5_video()
+
+	html = html.replace('<video width="1000" height="1000"', 
+				 '<video width="400" height="400"')
+
+	return HTML(html)

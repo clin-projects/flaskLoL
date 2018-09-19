@@ -56,8 +56,11 @@ def lolmain_page():
   gameID = 1
   game_dat = flaskLoL_utils.read_match(gameID)
   plot_url = flaskLoL_utils.get_plot(gameID)
-  winner = [1,0]
-  return render_template('lolmain.html', results = plot_url, game_dat= game_dat, winner=winner)
+  video_html = flaskLoL_utils.test_video_html()
+  winner = [0,1]
+
+  return render_template('lolmain.html', results = plot_url, game_dat= game_dat, winner=winner,
+    video_html = video_html)
 
 
 @app.route('/input')

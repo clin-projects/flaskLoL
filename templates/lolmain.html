@@ -7,7 +7,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../../../../favicon.ico">
 
-    <title>Starter Template for Bootstrap</title>
+    <title>LoL Winner Winner!!</title>
 
     <!-- Bootstrap core CSS -->
     <link href="../static/css/bootstrap.min.css" rel="stylesheet">
@@ -27,7 +27,7 @@
         <div class="form-group">
           <h1 style-"margin-bottom: 0 px">
           <label for="gameID">Please enter 10-digit game ID: </label>
-          <input type="text" id="gameID" name='gameID' placeholder="e.g., 2222222222 ">
+          <input style="text-align: center" type="text" id="gameID" name='gameID' placeholder="e.g., 2222222222 ">
           <button type="submit" class="btn btn-default btn-small">Track!</button>
         </h1>
         </div>
@@ -43,14 +43,9 @@
 <div class="row">
         <div class="col-md-3">
 
+
+
 <table class="table table-hover">
-<tr><td style="vertical-align:middle;padding-top: 5px;padding-bottom: 5px;" colspan="2" height="10" cellpadding="0" cellspacing="0">
-{% if winner[0] %}
-<p style="color:#3cbc8d; font-size:200%; margin-bottom: 3px">Victory</p>
-{% else %}
-<p style="color:#EB9C6B; font-size:200%; margin-bottom: 3px">Defeat</p>
-{% endif %}
-</td></tr> 
 {% for i in range(0,5) %}
 <tr>
   <td style="vertical-align:middle"><img src="{{ game_dat['photos'][i] }}" alt="{{ game_dat['champions'][i] }}" width="70"></td>
@@ -64,7 +59,20 @@
 
 
 <div class="starter-template">
-<img src="data:image/png;base64,{{ results }}" width="500">
+
+<table border-color="#FFFFFF" align=center><tr><td>
+{% if winner[1] %}
+<p style="color:#EA7375; font-size:170%; margin-bottom: 3px">Red team wins!</p>
+{% else %}
+<p style="color:#478DF4; font-size:170%; margin-bottom: 3px">Blue team wins!</p>
+{% endif %}
+</td></tr></table>
+
+<table>
+<tr><td style="width:80%">
+  {{ video_html }}
+</td></tr>
+</table>
 
 
 <center><table>
@@ -79,13 +87,6 @@
         <div class="col-md-3">
 
 <table class="table table-hover">
-<tr><td style="vertical-align:middle;padding-top: 5px;padding-bottom: 5px;" colspan="2" height="10" cellpadding="0" cellspacing="0">
-{% if winner[1] %}
-<p style="color:#3cbc8d; font-size:200%; margin-bottom: 3px">Victory</p>
-{% else %}
-<p style="color:#EB9C6B; font-size:200%; margin-bottom: 3px">Defeat</p>
-{% endif %}
-</td></tr> 
 {% for i in range(5,10) %}
 <tr>
   <td bgcolor="#EA7375" style="color: white; vertical-align:middle">{{ game_dat['names'][i] }}</td>
@@ -96,13 +97,6 @@
 
         </div>
       </div>
-
-
-
-
-
-
-
 
 
 
