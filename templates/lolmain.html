@@ -6,6 +6,12 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="../../../../favicon.ico">
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/annotations.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+
 
     <title>LoL Winner Winner!!</title>
 
@@ -26,7 +32,7 @@
       <form action="/lol_main" method="GET">
         <div class="form-group">
           <h1 style-"margin-bottom: 0 px">
-          <label for="gameID">Please enter 10-digit game ID: </label>
+          <label for="gameID">Enter 10-digit game ID: </label>
           <input style="text-align: center" type="text" id="gameID" name='gameID' placeholder="e.g., 2222222222 ">
           <button type="submit" class="btn btn-default btn-small">Track!</button>
         </h1>
@@ -60,17 +66,146 @@
 
 <div class="starter-template">
 
-<table border-color="#FFFFFF" align=center><tr><td>
-{% if winner[1] %}
-<p style="color:#EA7375; font-size:170%; margin-bottom: 3px">Red team wins!</p>
+<table id="result-table" style="display:none" border-color="#FFFFFF" align="center">
+  <tr><td style="width:100%">
+{% if winner == 0 %}
+<p style="color:#EA7375; font-size:170%; margin-bottom: 3px">Red team won!</p>
 {% else %}
-<p style="color:#478DF4; font-size:170%; margin-bottom: 3px">Blue team wins!</p>
+<p style="color:#478DF4; font-size:170%; margin-bottom: 3px">Blue team won!</p>
 {% endif %}
-</td></tr></table>
+</td></tr>
+</table>
+
+<table id="current-prob-table" style="display:inline" border-color="#FFFFFF" align="center">
+<tr><td id="current-prob" style="align:center; color:#478DF4; font-size:170%; margin-bottom: 3px">
+</td></tr>
+</table>
 
 <table>
 <tr><td style="width:80%">
-  {{ video_html }}
+  <div id="container" style="min-width: 350px; height: 400px; margin: 0 auto; align: middle"></div>
+
+<script>
+$(function () { 
+    var myChart = 
+Highcharts.chart('container', {
+    chart: {
+        type: 'line',
+        animation: false, // don't animate in old IE
+        marginRight: -10,
+        events: {
+            load: function () {
+                // set up the updating of the chart each second
+                var series = this.series[0];
+                var x = {{ frames }};
+                var y = {{ predictions }};
+                var i = 0;
+                var show = 0;
+                var intervalId = setInterval(function(){
+                   if(i === {{ maxframe }}){
+                      document.getElementById("result-table").style.display = "inline";
+                      document.getElementById("current-prob-table").style.display = "none";
+                      clearInterval(intervalId);
+                   }
+                   
+                   series.addPoint([x[i], y[i]], true, true);
+
+                   var disp_string = "(" + x[i].toString() + ' mins, ~' + (y[i]*100).toFixed(0).toString() + "%)";
+                   document.getElementById("current-prob").innerHTML = disp_string;
+
+                   i++;
+                }, 500);
+                
+                
+            }
+        },
+        style: {
+          fontFamily: 'sans-serif'
+        }
+    },
+
+    time: {
+        useUTC: false
+    },
+
+    title: {
+        text: '<b>Chance of Blue winning</b>',
+        align: 'center',
+        x: 20
+    },
+    xAxis: {
+        title: {
+          text: 'Time in game (minutes)'
+        },
+        min: 0,
+        max: {{ maxframe }},
+        tickInterval: 1
+    },
+    yAxis: {
+        title: {
+            text: 'Percent'
+        },
+        plotLines: [{
+            value: 0,
+            width: 1,
+            color: '#478DF4'
+            },
+
+            {value: 0.5,
+                color: 'black',
+                dashStyle: 'shortdash',
+                width: 2,
+                label: {
+                    text: '50/50',
+                    align: 'right',
+                    textAlign: 'right',
+                    x: -10
+                }
+            }
+        ],
+        min: 0,
+        max: 1,
+        tickInterval: 0.1
+    },
+    tooltip: {
+        headerFormat: '<b>{series.name}</b><br/>',
+        pointFormat: '{point.x:.0f}, {point.y:.2f}'
+    },
+    legend: {
+        enabled: false
+    },
+    exporting: {
+        enabled: false
+    },
+    series: [{
+        name: 'Chance of Blue winning',
+        marker: {
+          fillColor: '#FFFFFF',
+          lineWidth: 2,
+          lineColor: null,
+          enabled: true
+        },
+        data: (function () {
+            // generate an array of random data
+            var data = [],
+                time = (new Date()).getTime(),
+                i;
+
+            for (i = -50; i <= 0; i += 1) {
+                data.push({
+                    x: {{ frames[0] }},
+                    y: {{ predictions[0] }}
+                });
+            }
+            return data;
+        }())
+    }]
+});
+});
+</script>
+
+
+
 </td></tr>
 </table>
 
@@ -78,6 +213,7 @@
 <center><table>
 <tr><td style="width:50%"><b>Date and time</b></td> <td align="right" style="width:50%">{{ game_dat['game_start'] }}</td></tr>
 <tr><td style="width:50%"><b>Duration</b></td> <td align="right" style="width:50%">{{ game_dat['duration'] }}</td></tr>
+<tr><td style="width:50%"><b>Game ID</b></td> <td align="right" style="width:50%">{{ gameID }}</td></tr>
 </table>
 </center>
 
