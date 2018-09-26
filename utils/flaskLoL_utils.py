@@ -9,6 +9,19 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from IPython.display import HTML
 
+import psycopg2
+
+from riotwatcher import RiotWatcher
+
+api_key = 'RGAPI-444da87e-5054-476f-9f85-b9e237210c56'
+
+watcher = RiotWatcher(api_key)
+
+my_region = 'na1'
+
+
+
+
 def read_match(gameID):
 	match_file = '/Users/ccl/anaconda3/envs/LoL/flaskapp/flaskLoL/dat/match_%d.json' % (gameID)
 	timeline_file = match_file.replace('match','timeline')
@@ -263,7 +276,29 @@ def predict(lag, coef, gold_rescaled, kills, monsters, buildings):
 		y_predictions.append(y_pred)
 	return y_predictions
 
-def read_and_predict(gameID):
+def read_and_predict(gameID, con):
+
+	# sql_query ="""
+	# SELECT EXISTS(SELECT 1 FROM match_predictions WHERE game_id = '%s')
+	# """ % (gameID)
+
+	# query_results=pd.read_sql_query(sql_query,con)
+
+	# print(query_results)
+
+	# if query_results.iloc[0][0]:
+	# 	# already exists
+	# 	print('already exists!')
+
+		# sql_query = 
+		# """
+		# SELECT winner, num_frames, predictions FROM match_predictions WHERE game_id = '%s'
+		# """ % (match_id)
+
+		# winner, len(gold_rescaled), y_predictions = vpd.read_sql_query(sql_query,con)
+
+
+	# else:
 	param_file = '/Users/ccl/anaconda3/envs/LoL/flaskapp/flaskLoL/static/param/model_parameters.npz'
 	params = np.load(param_file)
 	gold_min = params['gold_min']
@@ -279,8 +314,106 @@ def read_and_predict(gameID):
 
 	y_predictions = predict(lag, coef, gold_rescaled, kills, monsters, buildings)
 
-	return winner, list(range(len(gold_rescaled))), y_predictions
+	y_predictions
+
+	num_frames = len(gold_rescaled)
+
+	str_predictions = ''
+	for p in y_predictions:
+		str_predictions += str(p) +','
+	str_predictions = str_predictions[:-1]
 
 
+	# sql_query ="""
+	# 			INSERT INTO match_predictions (game_id, winner, num_frames, predictions)
+	# 			VALUE (%s,
+	# 				%d,
+	# 				%d,
+	# 				'{%s}'
+	# 				)
+	# 			""" % (gameID, winner, num_frames, str_predictions)
+		
+	# print(sql_query)
 
+	# con.cursor.execute(sql_query)
+
+	return winner, num_frames, y_predictions
+
+def get_time(ms):
+	t = datetime.datetime.fromtimestamp(ms/1000.0)
+	t = t.astimezone(timezone('US/Pacific'))
+	return t.strftime('%B %d, %Y: %H:%M PST')
+
+def get_matches(summoner_name):
+	summoner_info = watcher.summoner.by_name(my_region, summoner_name)
+	account_id = summoner_info['accountId']
+	all_matches = watcher.match.matchlist_by_account(my_region,
+											 account_id = account_id, 
+											 queue = [400, 420, 430, 440],
+											 season=11)
+	matches = []
+	print(len(all_matches['matches']))
+	num_matches = min(5, len(all_matches['matches']))
+	print(num_matches)
+	for i in range(num_matches):
+		cur_match = all_matches['matches'][i]
+		ms = cur_match['timestamp']
+		matches.append(dict(index=i,
+			match_id = cur_match['gameId'],
+			duration = get_time(ms)))
+	return matches
+
+import pandas as pd
+
+
+def check_match_in_table(match_id, con):
+
+	try:
+
+		sql_query ="""
+					SELECT EXISTS(SELECT 1 FROM match_table WHERE game_id = '%s')
+					""" % (match_id)
+
+		query_results=pd.read_sql_query(sql_query,con)
+
+		print(query_results)
+
+		if query_results.iloc[0][0]:
+			# already exists
+			print('already exists!')
+			
+		else:
+			# need to fetch
+			print('need to fetch. fetching')
+			
+			sql_query ="""
+						INSERT INTO match_table (game_id)
+						VALUE (%s)
+						""" % (match_id)
+						
+			print(sql_query)
+
+			
+			
+			match_file = '/Users/ccl/anaconda3/envs/LoL/flaskapp/flaskLoL/dat/match_%d.json' % (match_id)
+			timeline_file = match_file.replace('match','timeline')
+			match = watcher.match.by_id(my_region, match_id = match_id)
+			timeline = watcher.match.timeline_by_match(my_region, match_id = match_id)
+
+			with open(match_file, 'w') as fp:
+					json.dump(match, fp)
+			with open(timeline_file, 'w') as fp:
+					json.dump(timeline, fp)
+
+			print('here')
+			con.cursor.execute(sql_query)
+
+			print('here2')
+		return 1
+
+	except:
+
+		print('failed')
+
+		return 0
 

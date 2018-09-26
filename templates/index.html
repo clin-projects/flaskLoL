@@ -27,13 +27,13 @@
     <main role="main" class="container">
 
 <div class="jumbotron" style="height: 160px;vertical-align:middle;padding-top: 10px;padding-bottom: 0px;">
-    <img src="../static/img/logo.png" width="300" style="padding-bottom: 10px;">
+    <a href="/index"><img src="../static/img/logo.png" width="300" style="padding-bottom: 10px;"></a>
     <br>
       <form action="/lol_main" method="GET">
         <div class="form-group">
           <h1 style-"margin-bottom: 0 px">
           <label for="gameID">Enter 10-digit game ID: </label>
-          <input style="text-align: center" type="text" id="gameID" name='gameID' placeholder="e.g., 2222222222 ">
+          <input style="text-align: center" type="text" id="gameID" name='gameID' placeholder="e.g., 2222222222">
           <button type="submit" class="btn btn-default btn-small">Track!</button>
         </h1>
         </div>
@@ -44,8 +44,66 @@
 
 </div>
 
+<br>
+
+<div class="player-bar" style="
+    vertical-align: middle;
+    text-align: center;
+    height: 40px;
+    padding-top: 10px;
+    padding-bottom: 50px;
+    background-color: #eeeeee;
+    width: 800px;
+    margin: 0 auto;
+">
+
+<form action="/index" method="GET">
+        <div class="form-group">
+          <h1 style-"margin-bottom: 0 px">
+          <label for="player_name">Enter player name: </label>
+          <input style="text-align: center" type="text" id="player_name" name='player_name' placeholder="e.g., DoubleLift" value ="DoubleLift">
+          <button type="submit" class="btn btn-default btn-small">Get last 5 matches</button>
+        </h1>
+        </div>
+      </form>
+
+</div>
+
+<br>
+
+<div style="
+  width: 800px;
+  margin: 0 auto;
+  text-align: left;
+  vertical-align: center;
+  font-size: large;
+  padding-bottom: 20px;
+">
+Showing last 5 matches for player <span style="color:#478DF4"><b>{{ player_name }}:</b></span>
+</div>
+
+<div class="last-matches-table" style="text-align: left;vertical-align: middle;width: 800px;margin:0 auto;">
+
+<table class="table table-hover">
+<tr><th>Index</th><th>Game ID</th><th>Date and time</th><th>Track this game</th></tr> 
+{% for match in matches %} 
+<tr><td>{{ match['index'] }}</td><td>{{ match['match_id'] }}</td><td>{{ match['duration']}}</td><td>
+<form action="/lol_main" method="GET">
+        <div class="form-group">
+          <h1 style-"margin-bottom: 0 px">
+          <input style="display: none; text-align: center" type="text" id="gameID" name='gameID' value=
+          {{ match['match_id'] }}>
+          <button type="submit" class="btn btn-default btn-small">Track!</button>
+        </h1>
+        </div>
+      </form>
+</td></tr> 
+{% endfor %} 
+</table> 
 <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script> 
-<script src="static/js/bootstrap.min.js"></script> 
+<script src="static/js/bootstrap.min.js"></script>
+
+</div>
 
     </main><!-- /.container -->
 

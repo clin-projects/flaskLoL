@@ -8,15 +8,12 @@ import pandas as pd
 import psycopg2
 from flaskLoL.utils import flaskLoL_utils
 
-
-
-
 # Python code to connect to Postgres
 # You may need to modify this based on your OS, 
 # as detailed in the postgres dev setup materials.
 user = 'ccl' #add your Postgres username here      
 host = 'localhost'
-dbname = 'birth_db'
+dbname = 'matches'
 db = create_engine('postgres://%s%s/%s'%(user,host,dbname))
 con = None
 con = psycopg2.connect(database = dbname, user = user, host = host) #add your Postgres password here
@@ -24,17 +21,27 @@ con = psycopg2.connect(database = dbname, user = user, host = host) #add your Po
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template("index.html")
+
+	player_name = str(request.args.get('player_name'))
+
+	if player_name == "None":
+		player_name = "DoubleLift"
+	
+	matches = flaskLoL_utils.get_matches(player_name)
+
+	return render_template("index.html", player_name = player_name,
+		matches = matches)
 
 @app.route('/lol_main')
 def lolmain_page():
-  gameID = int(request.args.get('gameID'))
-  game_dat = flaskLoL_utils.read_match(gameID)
-  plot_url = flaskLoL_utils.get_plot(gameID)
-  video_html = flaskLoL_utils.test_video_html()
-  winner, frames, predictions = flaskLoL_utils.read_and_predict(gameID)
+	gameID = int(request.args.get('gameID'))
+	success = flaskLoL_utils.check_match_in_table(gameID, con)
+	game_dat = flaskLoL_utils.read_match(gameID)
+	plot_url = flaskLoL_utils.get_plot(gameID)
+	video_html = flaskLoL_utils.test_video_html()
+	winner, frames, predictions = flaskLoL_utils.read_and_predict(gameID, con)
 
-  return render_template('lolmain.html', results = plot_url, game_dat= game_dat, winner=winner,
-    video_html = video_html, frames = frames, predictions = predictions,
-    maxframe = min(len(frames), 40),
-    gameID = gameID)
+	return render_template('lolmain.html', results = plot_url, game_dat= game_dat, winner=winner,
+		video_html = video_html, frames = list(range(frames)), predictions = predictions,
+		maxframe = min(frames, 40),
+		gameID = gameID)
